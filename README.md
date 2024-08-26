@@ -36,7 +36,7 @@ Tools to facilitate markdown writing
 Pandoc Markdown To Word (docx)
 
 Usage:
-     pandoc-pku [-i <input-markdown-files...>] [--backup=true|false]
+     pandocx [-i <input-markdown-files...>] [--backup=true|false]
 Options:
      -i <input-markdown-files...>  Specify the Markdown files to convert. You can specify multiple Markdown files.
                                    If not provided, all .md files in the current directory will be used.

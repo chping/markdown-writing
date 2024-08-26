@@ -1,0 +1,118 @@
+#!/bin/sh
+set -e
+
+helpdoc() {
+    cat <<EOF
+Pandoc Markdown To Word (docx)
+
+Usage:
+     pandoc-pku [-i <input-markdown-files...>] [--backup=true|false]
+Options:
+     -i <input-markdown-files...>  Specify the Markdown files to convert. You can specify multiple Markdown files.
+                                   If not provided, all .md files in the current directory will be used.
+     --backup=true|false           If true or not set, will back up the existing exported.docx before overwriting. Default is true.
+
+Note:
+     Please put the corresponding BibTex lib under the 'panlib' folder with name of 'bibtex.bib'
+EOF
+}
+
+# Initialize variables
+INPUT_FILES=()
+BACKUP=true  # Default is true
+USE_SPECIFIED_FILES=false  # Track whether -i option is used
+
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -i)
+            USE_SPECIFIED_FILES=true
+            shift
+            while [[ $# -gt 0 && $1 != -* ]]; do
+                INPUT_FILES+=("$1")
+                shift
+            done
+            ;;
+        --backup=true)
+            BACKUP=true
+            shift
+            ;;
+        --backup=false)
+            BACKUP=false
+            shift
+            ;;
+        -h|--help)
+            helpdoc
+            exit 0
+            ;;
+        *)
+            helpdoc
+            exit 1
+            ;;
+    esac
+done
+
+# If -i option was used but no files were provided, show an error
+if [ "$USE_SPECIFIED_FILES" = true ] && [ ${#INPUT_FILES[@]} -eq 0 ]; then
+    echo "Error: No Markdown files specified with -i option."
+    exit 1
+fi
+
+# If no input files were provided (i.e., -i was not used), find all .md files in the current directory
+if [ "$USE_SPECIFIED_FILES" = false ]; then
+    INPUT_FILES=($(ls *.md 2>/dev/null | sort))
+    if [ ${#INPUT_FILES[@]} -eq 0 ]; then
+        echo "Error: No Markdown files found in the current directory."
+        exit 1
+    fi
+fi
+
+# Ensure all specified input files exist
+for file in "${INPUT_FILES[@]}"; do
+    if [ ! -f "$file" ]; then
+        echo "Error: File '$file' does not exist."
+        exit 1
+    fi
+done
+
+# Function to backup the existing exported.docx file
+backup_file() {
+    if [ -f "exported.docx" ]; then
+        local base_name="exported"
+        local date_str=$(date +"%Y-%m%d")
+        local counter=1
+        local backup_name="${base_name}-${date_str}-${counter}.docx"
+
+        while [ -f "$backup_name" ]; do
+            counter=$((counter + 1))
+            backup_name="${base_name}-${date_str}-${counter}.docx"
+        done
+
+        mv "exported.docx" "$backup_name"
+        echo "Backup created: $backup_name"
+    fi
+}
+
+# Backup the existing exported.docx if the --backup option is true (default)
+if [ "$BACKUP" = true ]; then
+    backup_file
+fi
+
+PANDOC=/usr/local/bin/pandoc
+PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
+LIB_PATH=$(pwd)/panlib
+CONFIG_YAML=$LIB_PATH/config.yaml
+CROSSREF_YAML=$LIB_PATH/crossref.yaml
+CSL_FILE=$LIB_PATH/reference.csl
+DOC_TEMPLATE=$LIB_PATH/template.docx
+BIBTEX_FILE=$LIB_PATH/bibtex.bib
+PAGE_LINE_BREAK_FILTER=$LIB_PATH/page-and-line-break.lua
+
+# Run Pandoc with all markdown files passed from command line
+$PANDOC --filter $PANDOC_CROSSREF --defaults=$CONFIG_YAML --citeproc --csl $CSL_FILE \
+    --bibliography $BIBTEX_FILE \
+    -M "crossrefYaml=$CROSSREF_YAML" \
+    --reference-doc $DOC_TEMPLATE \
+    --lua-filter $PAGE_LINE_BREAK_FILTER \
+    -f markdown "${INPUT_FILES[@]}" \
+    -o exported.docx

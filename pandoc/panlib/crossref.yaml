@@ -1,0 +1,18 @@
+chapters: false #控制图表及公式编号是否添加章节号前缀
+# Figures
+figureTitle: "图"
+figPrefix: "图"
+figureTemplate: $$figureTitle$$ $$i$$&nbsp; $$t$$
+# Equations
+eqnPrefix: ""
+eqnIndexTemplate: ($$i$$)
+eqnPrefixTemplate: $$p$$&nbsp;($$i$$)
+autoEqnLabels: true
+tableEqns: true
+eqnBlockTemplate: |
+   `<w:pPr><w:tabs><w:tab w:val="center" w:leader="none" w:pos="4680" /><w:tab w:val="right" w:leader="none" w:pos="9060" /></w:tabs></w:pPr><w:r><w:tab /></w:r>`{=openxml} $$t$$ `<w:r><w:tab /></w:r>`{=openxml} $$i$$
+eqnBlockInlineMath: true
+# Tables
+tableTitle: "表"
+tblPrefix: "表"
+tableTemplate: $$tableTitle$$ $$i$$&nbsp; $$t$$

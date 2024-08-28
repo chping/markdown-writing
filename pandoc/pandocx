@@ -6,7 +6,7 @@ helpdoc() {
 Pandoc Markdown To Word (docx)
 
 Usage:
-     pandocx [-i <input-markdown-files...>] [--backup=true|false]
+     pandoc-pku [-i <input-markdown-files...>] [--backup=true|false]
 Options:
      -i <input-markdown-files...>  Specify the Markdown files to convert. You can specify multiple Markdown files.
                                    If not provided, all .md files in the current directory will be used.
@@ -109,10 +109,10 @@ BIBTEX_FILE=$LIB_PATH/bibtex.bib
 PAGE_LINE_BREAK_FILTER=$LIB_PATH/page-and-line-break.lua
 
 # Run Pandoc with all markdown files passed from command line
-$PANDOC --filter $PANDOC_CROSSREF --defaults=$CONFIG_YAML --citeproc --csl $CSL_FILE \
-    --bibliography $BIBTEX_FILE \
+$PANDOC --filter $PANDOC_CROSSREF --defaults="$CONFIG_YAML" --citeproc --csl "$CSL_FILE" \
+    --bibliography "$BIBTEX_FILE" \
     -M "crossrefYaml=$CROSSREF_YAML" \
-    --reference-doc $DOC_TEMPLATE \
-    --lua-filter $PAGE_LINE_BREAK_FILTER \
+    --reference-doc "$DOC_TEMPLATE" \
+    --lua-filter "$PAGE_LINE_BREAK_FILTER" \
     -f markdown "${INPUT_FILES[@]}" \
     -o exported.docx

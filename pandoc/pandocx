@@ -6,11 +6,12 @@ helpdoc() {
 Pandoc Markdown To Word (docx)
 
 Usage:
-     pandoc-pku [-i <input-markdown-files...>] [--backup=true|false]
+     pandoc-pku [-i <input-markdown-files...>] [-o <output-filename>] [--backup=true|false]
 Options:
      -i <input-markdown-files...>  Specify the Markdown files to convert. You can specify multiple Markdown files.
                                    If not provided, all .md files in the current directory will be used.
-     --backup=true|false           If true or not set, will back up the existing exported.docx before overwriting. Default is true.
+     -o <output-filename>          Specify the name of the output file. If not provided, the default is 'exported.docx'.
+     --backup=true|false           If true or not set, will back up the existing output file before overwriting. Default is true.
 
 Note:
      Please put the corresponding BibTex lib under the 'panlib' folder with name of 'bibtex.bib'
@@ -19,6 +20,7 @@ EOF
 
 # Initialize variables
 INPUT_FILES=()
+OUTPUT_FILE="exported.docx"  # Default output file name
 BACKUP=true  # Default is true
 USE_SPECIFIED_FILES=false  # Track whether -i option is used
 
@@ -32,6 +34,11 @@ while [[ $# -gt 0 ]]; do
                 INPUT_FILES+=("$1")
                 shift
             done
+            ;;
+        -o)
+            shift
+            OUTPUT_FILE="$1"
+            shift
             ;;
         --backup=true)
             BACKUP=true
@@ -75,25 +82,26 @@ for file in "${INPUT_FILES[@]}"; do
     fi
 done
 
-# Function to backup the existing exported.docx file
+# Function to backup the existing output file
 backup_file() {
-    if [ -f "exported.docx" ]; then
-        local base_name="exported"
+    if [ -f "$OUTPUT_FILE" ]; then
+        local base_name="${OUTPUT_FILE%.*}"  # Remove the file extension
+        local extension="${OUTPUT_FILE##*.}"  # Extract the file extension
         local date_str=$(date +"%Y-%m%d")
         local counter=1
-        local backup_name="${base_name}-${date_str}-${counter}.docx"
+        local backup_name="${base_name}-${date_str}-${counter}.${extension}"
 
         while [ -f "$backup_name" ]; do
             counter=$((counter + 1))
-            backup_name="${base_name}-${date_str}-${counter}.docx"
+            backup_name="${base_name}-${date_str}-${counter}.${extension}"
         done
 
-        mv "exported.docx" "$backup_name"
+        mv "$OUTPUT_FILE" "$backup_name"
         echo "Backup created: $backup_name"
     fi
 }
 
-# Backup the existing exported.docx if the --backup option is true (default)
+# Backup the existing output file if the --backup option is true (default)
 if [ "$BACKUP" = true ]; then
     backup_file
 fi
@@ -115,4 +123,4 @@ $PANDOC --filter $PANDOC_CROSSREF --defaults="$CONFIG_YAML" --citeproc --csl "$C
     --reference-doc "$DOC_TEMPLATE" \
     --lua-filter "$PAGE_LINE_BREAK_FILTER" \
     -f markdown "${INPUT_FILES[@]}" \
-    -o exported.docx
+    -o "$OUTPUT_FILE"

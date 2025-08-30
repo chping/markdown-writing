@@ -1,0 +1,56 @@
+\documentclass{article}
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+% \usepackage[english]{babel}
+\usepackage[UTF8]{ctex}
+\usepackage{xeCJK}
+\usepackage{lmodern}
+
+% \usepackage{unicode-math}
+% \setmathfont{Latin Modern Math} % 或 XITS Math
+
+% \usepackage{mathptmx} % 使用 Times New Roman 公式字体
+% \usepackage{newtxtext, newtxmath} % 文本和数学字体都改为 Times
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{bm}
+
+% for Pandoc
+\usepackage{longtable,array}
+\usepackage{calc}                     % 允许 (\linewidth - n\tabcolsep) 这类算式
+\usepackage{xfp}                      % 暴露 LaTeX3 浮点：\real{...} 等（新内核也可用）
+
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{../panlib/bibtex.bib} 
+% 处理Markdown文件中的图片宽度和高度设置项
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth \linewidth \else \Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight \textheight \else \Gin@nat@height\fi}
+\makeatother
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Pandoc >= 3.2.1 引入的新宏；保守直通版（若需“限制溢出”的完整实现，可替换为 Pandoc 默认模板中的版本）
+\providecommand{\pandocbounded}[1]{#1} % 见 Pandoc 3.2.1 变更说明
+% 紧凑列表宏；避免 \tightlist 未定义
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\title{_Title_}
+\author{_AuthorName_}
+
+\begin{document}
+
+%%INPUTS%%
+
+\printbibliography
+\end{document}

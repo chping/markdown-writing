@@ -1,0 +1,49 @@
+{
+    "workbench.colorTheme": "Quiet Light",
+    // 隐藏代码相关提示
+    "editor.quickSuggestions": {
+        "other": false,
+        "comments": false,
+        "strings": false
+    },
+    "editor.snippetSuggestions": "none",
+    "editor.wordBasedSuggestions": "off",
+    // 优化文本编辑
+    "editor.formatOnSave": false, // 关闭自动格式化（避免打乱排版）
+    "editor.lineNumbers": "on", // 行号
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 110,
+    "editor.rulers": [
+        120
+    ], // 80字符处显示参考线（控制行长度）
+    "editor.fontFamily": "'consolaslxgw', 'Georgia', sans-serif", // 中文字体优先
+    "latex-workshop.latex.outDir": "output", // 所有输出文件放入output目录
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk-xelatex", // 工具名
+            "command": "latexmk",
+            "args": [
+                "-xelatex", // 强制 XeLaTeX
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-outdir=%OUTDIR%", // 由扩展替换为 output
+                "%DOC%" // 主文件（不带扩展名）
+            ]
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "latexmk (xelatex)", // 配方名
+            "tools": [
+                "latexmk-xelatex"
+            ] // 引用上面的工具名
+        }
+    ],
+    // 设为默认配方（构建时就用它）
+    "latex-workshop.latex.recipe.default": "latexmk (xelatex)",
+    "latex-workshop.latex.autoClean.run": "onFailed",
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click"
+}

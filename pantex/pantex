@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+helpdoc() {
+    cat <<EOF
+Pandoc Markdown To Latex (tex)
+
+Usage:
+     pantex [-i <input markdown file(s)...>] [-o <output-folder>] [--backup=true|false]
+Options:
+     -i <input markdown file(s)>  Specify the Markdown files to convert. You can specify multiple Markdown files. If not provided, all .md files in the current directory will be used.
+     --backup=true|false   If true, will back up the existing output file before overwriting. Default is false.
+
+Note:
+     Please put the corresponding BibTex lib under the 'panlib' folder with name of 'bibtex.bib'
+EOF
+}
+
+# Initialize variables
+INPUT_FILES=()
+BACKUP=false  # Default is falses
+USE_SPECIFIED_FILES=false  # Track whether -i option is used
+OUTPUT_DIR="tex"  # Default output folder name
+
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -i)
+            USE_SPECIFIED_FILES=true
+            shift
+            while [[ $# -gt 0 && $1 != -* ]]; do
+                INPUT_FILES+=("$1")
+                shift
+            done
+            ;;
+        -o)
+            shift
+            OUTPUT_DIR="$1"
+            shift
+            ;;
+        --backup=true)
+            BACKUP=true
+            shift
+            ;;
+        --backup=false)
+            BACKUP=false
+            shift
+            ;;
+        -h|--help)
+            helpdoc
+            exit 0
+            ;;
+        *)
+            helpdoc
+            exit 1
+            ;;
+    esac
+done
+
+# If -i option was used but no files were provided, show an error
+if [ "$USE_SPECIFIED_FILES" = true ] && [ ${#INPUT_FILES[@]} -eq 0 ]; then
+    echo "Error: No Markdown files specified with -i option."
+    exit 1
+fi
+
+# If no input files were provided (i.e., -i was not used), find all .md files in the current directory
+if [ "$USE_SPECIFIED_FILES" = false ]; then
+    INPUT_FILES=($(ls *.md 2>/dev/null | sort))
+    if [ ${#INPUT_FILES[@]} -eq 0 ]; then
+        echo "Error: No Markdown files found in the current directory."
+        exit 1
+    fi
+fi
+
+# Ensure all specified input files exist
+for file in "${INPUT_FILES[@]}"; do
+    if [ ! -f "$file" ]; then
+        echo "Error: File '$file' does not exist."
+        exit 1
+    fi
+done
+
+# Function to backup the existing output files
+backup_file() {
+    if [ -d "$OUTPUT_DIR" ]; then
+        local base_name="${OUTPUT_DIR}"
+        local date_str=$(date +"%Y-%m%d")
+        local counter=1
+        local backup_name="${base_name}-${date_str}-${counter}"
+
+        while [ -d "$backup_name" ]; do
+            counter=$((counter + 1))
+            backup_name="${base_name}-${date_str}-${counter}"
+        done
+
+        mv "$OUTPUT_DIR" "$backup_name"
+        echo "Backup created: $backup_name"
+    fi
+}
+
+# Backup the existing output file if the --backup option is true (default)
+if [ "$BACKUP" = true ]; then
+    backup_file
+fi
+# Check and create the output folder
+mkdir -p "$OUTPUT_DIR"
+
+PANDOC=/usr/local/bin/pandoc
+PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
+LIB_PATH=$(pwd)/texlib
+CONFIG_YAML=$LIB_PATH/config.yaml
+CROSSREF_YAML=$LIB_PATH/crossref.yaml
+# CSL_FILE=$LIB_PATH/reference.csl
+TEMPLATE_MAIN=$LIB_PATH/template-main.latex
+BIBTEX_FILE=$LIB_PATH/bibtex.bib
+# PAGE_LINE_BREAK_FILTER=$LIB_PATH/page-and-line-break.lua
+# MATH_FILTER=$LIB_PATH/fix-math.lua
+IMAGE_PATH_FILTER=$LIB_PATH/image-path-filter.lua
+
+# Use pandoc converting all Markdown files to Latex and save *.tex to OUTPUT_DIR
+for md in $INPUT_FILES; do
+  # Processing Markdown files only
+  [ -e "$md" ] || continue
+  base="${md%.md}" 
+  out_tex="$OUTPUT_DIR/${base}.tex"
+  $PANDOC "$md" --defaults="$CONFIG_YAML" \
+    --from=markdown \
+    --to=latex \
+    --standalone=false \
+    --biblatex \
+    -M suppress-bibliography=true \
+    --filter $PANDOC_CROSSREF -M "crossrefYaml=$CROSSREF_YAML" \
+    --lua-filter $IMAGE_PATH_FILTER \
+    -o "$out_tex"
+done
+
+# List all exported .tex files and ordered by filename
+TMP_LIST="$(mktemp)"
+for tex in "$OUTPUT_DIR"/*.tex; do
+  # skip the main.tex
+  [ "$(basename "$tex")" = "main.tex" ] && continue
+  printf '\\input{%s}\n' "$(basename "$tex")" >> "$TMP_LIST"
+done
+
+# Generate the main.tex and save it to OUTPUT_DIR
+main_file="$OUTPUT_DIR/main.tex"
+sed "/%%INPUTS%%/r $TMP_LIST" "$TEMPLATE_MAIN" | sed 's/%%INPUTS%%//' > "$main_file"
+rm -f "$TMP_LIST"
+
+# Print the result
+echo "All Exported Latex files have been saved to folder: '$OUTPUT_DIR'"
+ls "$OUTPUT_DIR"

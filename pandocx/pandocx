@@ -1,17 +1,17 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 helpdoc() {
     cat <<EOF
 Pandoc Markdown To Word (docx)
 
 Usage:
-     pandoc-pku [-i <input-markdown-files...>] [-o <output-filename>] [--backup=true|false]
+     pandocx [-i <input-markdown-files...>] [-o <output-filename>] [--backup=true|false]
 Options:
      -i <input-markdown-files...>  Specify the Markdown files to convert. You can specify multiple Markdown files.
                                    If not provided, all .md files in the current directory will be used.
      -o <output-filename>          Specify the name of the output file. If not provided, the default is 'exported.docx'.
-     --backup=true|false           If true or not set, will back up the existing output file before overwriting. Default is true.
+     --backup=true|false           If true, will back up the existing output file before overwriting. Default is false.
 
 Note:
      Please put the corresponding BibTex lib under the 'panlib' folder with name of 'bibtex.bib'
@@ -21,7 +21,7 @@ EOF
 # Initialize variables
 INPUT_FILES=()
 OUTPUT_FILE="exported.docx"  # Default output file name
-BACKUP=true  # Default is true
+BACKUP=false  # Default is false
 USE_SPECIFIED_FILES=false  # Track whether -i option is used
 
 # Parse command-line options
@@ -108,13 +108,14 @@ fi
 
 PANDOC=/usr/local/bin/pandoc
 PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
-LIB_PATH=$(pwd)/panlib
+LIB_PATH=$(pwd)/docxlib
 CONFIG_YAML=$LIB_PATH/config.yaml
 CROSSREF_YAML=$LIB_PATH/crossref.yaml
 CSL_FILE=$LIB_PATH/reference.csl
 DOC_TEMPLATE=$LIB_PATH/template.docx
 BIBTEX_FILE=$LIB_PATH/bibtex.bib
 PAGE_LINE_BREAK_FILTER=$LIB_PATH/page-and-line-break.lua
+# MATH_FILTER=$LIB_PATH/fix-math.lua
 
 # Run Pandoc with all markdown files passed from command line
 $PANDOC --filter $PANDOC_CROSSREF --defaults="$CONFIG_YAML" --citeproc --csl "$CSL_FILE" \
@@ -123,4 +124,4 @@ $PANDOC --filter $PANDOC_CROSSREF --defaults="$CONFIG_YAML" --citeproc --csl "$C
     --reference-doc "$DOC_TEMPLATE" \
     --lua-filter "$PAGE_LINE_BREAK_FILTER" \
     -f markdown "${INPUT_FILES[@]}" \
-    -o "$OUTPUT_FILE"
+    -o "$OUTPUT_FILE" \

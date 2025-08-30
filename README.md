@@ -6,7 +6,7 @@ Tools to facilitate markdown writing
 - Currently, this script is only tested on macOS. It should theoretically work on other platforms (Linux) as long as you're using bash. If you encounter any issues, please submit an issue.
 - Before using this script, make sure to install [pandoc](https://pandoc.org/) and [pandoc-crossref](https://lierdakil.github.io/pandoc-crossref/).
 - Copy the `pandocx` file to `/usr/local/bin` or any other directory in your system's PATH (if you prefer not to copy, you can create a symbolic link using `ln -s /path/to/pandocx /usr/local/bin/pandocx`).
-- Next, copy the entire `panlib` directory to the project directory where you're writing your documents. Then, replace or modify the contents of the files in this directory according to your needs:
+- Next, copy the entire `docxlib` directory to the project directory where you're writing your documents. Then, replace or modify the contents of the files in this directory according to your needs:
   - `bibtex.bib`: Bibliography file for references. Replace it with your own (you can export from Zotero).
   - `config.yaml`: Metadata for your document, defining the title, format, and various configuration options. Modify it according to your requirements.
   - `crossref.yaml`: Cross-referencing configuration file. Modify it as needed.
@@ -21,7 +21,7 @@ Tools to facilitate markdown writing
 - 目前仅在MacOS上调试，其它平台（Linux）只要你使用bash，理论上也能运行。如果遇到问题请提issue
 - 使用本脚本前，需要安装 [pandoc](https://pandoc.org/) 和 [pandoc-crossref](https://lierdakil.github.io/pandoc-crossref/)
 - 请将`pandocx`文件拷贝到`/usr/local/bin`或你电脑其它任何可执行的目录下（如果你不想拷贝，也可以使用符号链接`ln -s /path/to/pandocx /usr/local/bin/pandocx`）
-- 然后将`panlib`目录整个拷贝到你写文档的项目目录，并根据你的需要替换或修改目录下的文件内容
+- 然后将`docxlib`目录整个拷贝到你写文档的项目目录，并根据你的需要替换或修改目录下的文件内容
   - `bibtex.bib` : 引用的参考文献库，请替换（可以使用Zotero导出）
   - `config.yaml`： 文稿的元数据metadata，定义了文档标题、格式等系列配置选项，请根据实际需要修改
   - `crossref.yaml`： 交叉引用配置文件，请根据实际需要修改

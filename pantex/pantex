@@ -8,8 +8,10 @@ Pandoc Markdown To Latex (tex)
 Usage:
      pantex [-i <input markdown file(s)...>] [-o <output-folder>] [--backup=true|false]
 Options:
-     -i <input markdown file(s)>  Specify the Markdown files to convert. You can specify multiple Markdown files. If not provided, all .md files in the current directory will be used.
-     --backup=true|false   If true, will back up the existing output file before overwriting. Default is false.
+     -i <input markdown file(s)>    Specify the Markdown files to convert. You can specify multiple Markdown files. 
+                                    If not provided, all .md files in the current directory will be used.
+     -o <output-filename>           Specify the name of the output folder. If not provided, the default is 'exported'.
+     --backup=true|false   If true, will back up the existing output folder before overwriting. Default is false.
 
 Note:
      Please put the corresponding BibTex lib under the 'panlib' folder with name of 'bibtex.bib'
@@ -20,7 +22,7 @@ EOF
 INPUT_FILES=()
 BACKUP=false  # Default is falses
 USE_SPECIFIED_FILES=false  # Track whether -i option is used
-OUTPUT_DIR="tex"  # Default output folder name
+OUTPUT_DIR="exported"  # Default output folder name
 
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
@@ -112,7 +114,7 @@ CONFIG_YAML=$LIB_PATH/config.yaml
 CROSSREF_YAML=$LIB_PATH/crossref.yaml
 # CSL_FILE=$LIB_PATH/reference.csl
 TEMPLATE_MAIN=$LIB_PATH/template-main.latex
-BIBTEX_FILE=$LIB_PATH/bibtex.bib
+# BIBTEX_FILE=$LIB_PATH/bibtex.bib
 # PAGE_LINE_BREAK_FILTER=$LIB_PATH/page-and-line-break.lua
 # MATH_FILTER=$LIB_PATH/fix-math.lua
 IMAGE_PATH_FILTER=$LIB_PATH/image-path-filter.lua

@@ -33,7 +33,7 @@
 \usepackage{xfp}                      % 暴露 LaTeX3 浮点：\real{...} 等（新内核也可用）
 
 \usepackage[backend=biber,style=numeric]{biblatex}
-\addbibresource{../panlib/bibtex.bib} 
+\addbibresource{../texlib/bibtex.bib} 
 % 处理Markdown文件中的图片宽度和高度设置项
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth \linewidth \else \Gin@nat@width\fi}

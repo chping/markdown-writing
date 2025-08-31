@@ -30,7 +30,7 @@ $$ {#eq:photon-energy}
 
 ## 2. 实验数据
 
-为了验证上述理论，我们进行了一系列实验测量，表 @tbl:particle-data 展示了几种基本粒子的能量与动量测量值。
+为了验证上述理论，我们进行了一系列实验测量， @tbl:particle-data 展示了几种基本粒子的能量与动量测量值。
 
 | 粒子类型 | 静止质量(kg) | 动量(p) (kg·m/s) | 能量(E) (J) |
 |----------|--------------|------------------|-------------|
@@ -42,19 +42,19 @@ $$ {#eq:photon-energy}
 
 ## 3. 数据分析
 
-根据表 @tbl:particle-data 中的实验数据，我们绘制了能量-动量关系散点图（图 [@fig:energy-momentum-plot] ），并与理论曲线进行了对比。
+根据 @tbl:particle-data 中的实验数据，我们绘制了能量-动量关系散点图（ [@fig:energy-momentum-plot] ），并与理论曲线进行了对比。
 
 ![能量-动量关系散点图，显示实验数据点与理论曲线高度吻合](example.jpg){#fig:energy-momentum-plot}
 
 
-从图 @fig:energy-momentum-plot 可以看出，实验数据点与式 @eq:energy-momentum 计算的理论曲线高度吻合，验证了相对论能量动量关系的正确性。
+从 @fig:energy-momentum-plot 可以看出，实验数据点与式 @eq:energy-momentum 计算的理论曲线高度吻合，验证了相对论能量动量关系的正确性。
 
 ## 4. 结论
 
 通过理论推导和实验验证，我们可以得出以下结论：
 
 1. 式 @eq:energy-momentum 准确描述了粒子能量与动量的相对论关系
-2. 实验数据（表 @tbl:particle-data）与理论预测（图 @fig:energy-momentum-plot ）高度一致
+2. 实验数据（ @tbl:particle-data）与理论预测（ @fig:energy-momentum-plot ）高度一致
 3. 光子作为静止质量为零的粒子，其能量动量关系符合简化公式 @eq:photon-energy
 
 这些结果进一步证实了相对论量子力学的基本原理，见参考文献 @pop2010。

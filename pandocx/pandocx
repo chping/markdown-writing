@@ -18,11 +18,25 @@ Note:
 EOF
 }
 
+PANDOC=/usr/local/bin/pandoc
+PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
+# Get script install path
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+
+
 # Initialize variables
+
 INPUT_FILES=()
 OUTPUT_FILE="exported.docx"  # Default output file name
 BACKUP=false  # Default is false
 USE_SPECIFIED_FILES=false  # Track whether -i option is used
+
 
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
@@ -67,11 +81,19 @@ fi
 
 # If no input files were provided (i.e., -i was not used), find all .md files in the current directory
 if [ "$USE_SPECIFIED_FILES" = false ]; then
-    INPUT_FILES=($(ls *.md 2>/dev/null | sort))
+    # 用 glob 而不是 ls，避免空格问题
+    shopt -s nullglob
+    INPUT_FILES=( *.md )
+    shopt -u nullglob
+
     if [ ${#INPUT_FILES[@]} -eq 0 ]; then
         echo "Error: No Markdown files found in the current directory."
         exit 1
     fi
+
+    # 如果需要排序（比如按字母顺序）
+    IFS=$'\n' INPUT_FILES=($(printf '%s\n' "${INPUT_FILES[@]}" | sort))
+    unset IFS
 fi
 
 # Ensure all specified input files exist
@@ -106,9 +128,13 @@ if [ "$BACKUP" = true ]; then
     backup_file
 fi
 
-PANDOC=/usr/local/bin/pandoc
-PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
-LIB_PATH=$(pwd)/docxlib
+# Check if 'docxlib' exist in current folder, if not, use the docxlib in SCRIPT home dir
+if [ -d "./docxlib" ]; then
+    LIB_PATH="$(pwd)/docxlib"
+else
+    LIB_PATH="$SCRIPT_DIR/docxlib"
+fi
+
 CONFIG_YAML=$LIB_PATH/config.yaml
 CROSSREF_YAML=$LIB_PATH/crossref.yaml
 CSL_FILE=$LIB_PATH/reference.csl

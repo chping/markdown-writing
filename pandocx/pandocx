@@ -151,3 +151,7 @@ $PANDOC --filter $PANDOC_CROSSREF --defaults="$CONFIG_YAML" --citeproc --csl "$C
     --lua-filter "$PAGE_LINE_BREAK_FILTER" \
     -f markdown "${INPUT_FILES[@]}" \
     -o "$OUTPUT_FILE" \
+
+
+echo "Total of ${#INPUT_FILES[@]} Markdown file(s) are merged and exported to '$OUTPUT_FILE'" 
+printf "\t%s\n" "${INPUT_FILES[@]}"

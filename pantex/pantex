@@ -18,6 +18,17 @@ Note:
 EOF
 }
 
+PANDOC=/usr/local/bin/pandoc
+PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
+# Get script install path
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+
 # Initialize variables
 INPUT_FILES=()
 BACKUP=false  # Default is falses
@@ -107,9 +118,13 @@ fi
 # Check and create the output folder
 mkdir -p "$OUTPUT_DIR"
 
-PANDOC=/usr/local/bin/pandoc
-PANDOC_CROSSREF=/usr/local/bin/pandoc-crossref
-LIB_PATH=$(pwd)/texlib
+# Check if 'docxlib' exist in current folder, if not, use the docxlib in SCRIPT home dir
+if [ -d "./texlib" ]; then
+    LIB_PATH="$(pwd)/texlib"
+else
+    LIB_PATH="$SCRIPT_DIR/texlib"
+fi
+
 CONFIG_YAML=$LIB_PATH/config.yaml
 CROSSREF_YAML=$LIB_PATH/crossref.yaml
 # CSL_FILE=$LIB_PATH/reference.csl

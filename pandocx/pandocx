@@ -141,17 +141,20 @@ CSL_FILE=$LIB_PATH/reference.csl
 DOC_TEMPLATE=$LIB_PATH/template.docx
 BIBTEX_FILE=$LIB_PATH/bibtex.bib
 PAGE_LINE_BREAK_FILTER=$LIB_PATH/page-and-line-break.lua
-# MATH_FILTER=$LIB_PATH/fix-math.lua
+MATH_FILTER=$LIB_PATH/fix-sum.lua
 
 # Run Pandoc with all markdown files passed from command line
-$PANDOC --filter $PANDOC_CROSSREF --defaults="$CONFIG_YAML" --citeproc --csl "$CSL_FILE" \
+$PANDOC --mathml -f markdown+tex_math_dollars "${INPUT_FILES[@]}" \
+    --lua-filter="$MATH_FILTER" \
+    --lua-filter="$PAGE_LINE_BREAK_FILTER" \
+    --defaults="$CONFIG_YAML" \
+    --filter $PANDOC_CROSSREF \
+    --citeproc --csl "$CSL_FILE" \
     --bibliography "$BIBTEX_FILE" \
     -M "crossrefYaml=$CROSSREF_YAML" \
     --reference-doc "$DOC_TEMPLATE" \
-    --lua-filter "$PAGE_LINE_BREAK_FILTER" \
-    -f markdown "${INPUT_FILES[@]}" \
     -o "$OUTPUT_FILE" \
-
+    
 
 echo "Total of ${#INPUT_FILES[@]} Markdown file(s) are merged and exported to '$OUTPUT_FILE'" 
 printf "\t%s\n" "${INPUT_FILES[@]}"

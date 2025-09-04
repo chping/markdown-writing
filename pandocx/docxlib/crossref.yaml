@@ -7,7 +7,7 @@ figureTemplate: $$figureTitle$$ $$i$$&nbsp; $$t$$
 eqnPrefix: ""
 eqnIndexTemplate: ($$i$$)
 eqnPrefixTemplate: $$p$$&nbsp;($$i$$)
-autoEqnLabels: true
+autoEqnLabels: false
 tableEqns: false
 eqnBlockTemplate: |
    `<w:pPr><w:tabs><w:tab w:val="center" w:leader="none" w:pos="4680" /><w:tab w:val="right" w:leader="none" w:pos="9060" /></w:tabs></w:pPr><w:r><w:tab /></w:r>`{=openxml} $$t$$ `<w:r><w:tab /></w:r>`{=openxml} $$i$$

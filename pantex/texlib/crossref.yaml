@@ -7,7 +7,7 @@ figureTemplate: $$figureTitle$$ $$i$$&nbsp; $$t$$
 eqnPrefix: ""
 eqnIndexTemplate: ($$i$$)
 eqnPrefixTemplate: $$p$$&nbsp;($$i$$)
-autoEqnLabels: true
+autoEqnLabels: false
 tableEqns: false
 eqnBlockInlineMath: true
 # Tables

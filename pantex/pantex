@@ -10,7 +10,7 @@ Usage:
 Options:
      -i <input markdown file(s)>    Specify the Markdown files to convert. You can specify multiple Markdown files. 
                                     If not provided, all .md files in the current directory will be used.
-     -o <output-filename>           Specify the name of the output folder. If not provided, the default is 'exported'.
+     -o <output-folder-name>           Specify the name of the output folder. If not provided, the default is 'exported'.
      --backup=true|false   If true, will back up the existing output folder before overwriting. Default is false.
 
 Note:
@@ -78,11 +78,19 @@ fi
 
 # If no input files were provided (i.e., -i was not used), find all .md files in the current directory
 if [ "$USE_SPECIFIED_FILES" = false ]; then
-    INPUT_FILES=($(ls *.md 2>/dev/null | sort))
+    # 用 glob 而不是 ls，避免空格问题
+    shopt -s nullglob
+    INPUT_FILES=( *.md )
+    shopt -u nullglob
+
     if [ ${#INPUT_FILES[@]} -eq 0 ]; then
         echo "Error: No Markdown files found in the current directory."
         exit 1
     fi
+
+    # 如果需要排序（比如按字母顺序）
+    IFS=$'\n' INPUT_FILES=($(printf '%s\n' "${INPUT_FILES[@]}" | sort))
+    unset IFS
 fi
 
 # Ensure all specified input files exist
@@ -116,6 +124,7 @@ if [ "$BACKUP" = true ]; then
     backup_file
 fi
 # Check and create the output folder
+rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 # Check if 'docxlib' exist in current folder, if not, use the docxlib in SCRIPT home dir
@@ -135,10 +144,11 @@ TEMPLATE_MAIN=$LIB_PATH/template-main.latex
 IMAGE_PATH_FILTER=$LIB_PATH/image-path-filter.lua
 
 # Use pandoc converting all Markdown files to Latex and save *.tex to OUTPUT_DIR
-for md in $INPUT_FILES; do
+for md in "${INPUT_FILES[@]}"; do
   # Processing Markdown files only
   [ -e "$md" ] || continue
-  base="${md%.md}" 
+  base="${md##*/}"             # 仅取文件名
+  base="${base%.md}"           # 去 .md 后缀
   out_tex="$OUTPUT_DIR/${base}.tex"
   $PANDOC "$md" --defaults="$CONFIG_YAML" \
     --from=markdown \
@@ -153,10 +163,14 @@ done
 
 # List all exported .tex files and ordered by filename
 TMP_LIST="$(mktemp)"
-for tex in "$OUTPUT_DIR"/*.tex; do
-  # skip the main.tex
-  [ "$(basename "$tex")" = "main.tex" ] && continue
-  printf '\\input{%s}\n' "$(basename "$tex")" >> "$TMP_LIST"
+for md in "${INPUT_FILES[@]}"; do
+  base="${md##*/}"
+  base="${base%.md}"
+  tex="$OUTPUT_DIR/${base}.tex"
+  # 跳过不存在或 main.tex
+  [ -f "$tex" ] || continue
+  [ "$base" = "main" ] && continue
+  printf '%s\n' "\\input{$(basename "$tex")}" >> "$TMP_LIST"
 done
 
 # Generate the main.tex and save it to OUTPUT_DIR

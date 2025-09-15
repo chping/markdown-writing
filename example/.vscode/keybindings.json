@@ -1,0 +1,27 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+    "key": "ctrl+alt+[",
+    "command": "editor.action.insertSnippet",
+    "when": "editorLangId == latex || editorLangId ==markdown && editorTextFocus",
+    "args": {
+        "snippet": "\\left[$0\\right]"
+    }
+},
+    {
+    "key": "ctrl+shift+alt+[",
+    "command": "editor.action.insertSnippet",
+    "when": "editorLangId == latex || editorLangId == markdown && editorTextFocus",
+    "args": {
+        "snippet": "\\left\\{$0\\right\\}"
+    }
+},
+    {
+    "key": "ctrl+shift+alt+9",
+    "command": "editor.action.insertSnippet",
+    "when": "editorLangId == latex || editorLangId == markdown && editorTextFocus",
+    "args": {
+        "snippet": "\\left($0\\right)"
+    }
+}
+]

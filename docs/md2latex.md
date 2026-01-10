@@ -1,150 +1,213 @@
----
-title: "Title of the Paper"
-author: "Author Name"
-date: 2026-01-XX
-bibliography: references.bib
----
 
-# Introduction
+# Markdown → Pandoc → LaTeX 写作注意事项清单
 
-> 这是一个示例，展示了如何编写兼容pandox可转化为正确latex的markdown文件
+> 目标：
+>
+> - Markdown 阶段可读、可正常渲染
+> - Pandoc 转换过程稳定、不引入语法错误
+> - LaTeX 阶段可精确控制编号、引用与排版
+> - 适用于论文、技术报告、学位论文写作流程
 
-本文研究高维随机电路性能在 **high-sigma** 条件下的统计建模与分析问题。  
-在先进 SRAM 设计中，性能指标往往可表示为高维随机变量的非线性映射  
-\(\,y = f(X)\,\)，其中 \(X\) 表示工艺随机参数向量。
+##  总体原则
 
-已有研究表明，该类问题在尾部区域（tail region）具有显著的非高斯行为
-[@wang2011; @venugopalan2013]。
+- Markdown **只用于内容表达**，不承担精细排版职责
+- 不在 Markdown 中强行“模拟 LaTeX 论文格式”
+- 数学编号、交叉引用、浮动体控制统一交给 LaTeX
+- **稳定性优先于语法美观**
 
-> ⚠️ 注意  
-> - 行内公式统一使用 `\(...\)`  
-> - 不使用 `$...$`  
+## 1. 行内公式（Inline Math）
 
----
+### ✅ 推荐写法
 
-# Problem Formulation
+```markdown
+$a + b$
+```
 
-设随机向量 \(X \in \mathbb{R}^d\)，其联合分布由工艺模型给出。
-定义性能指标 \(Y = f(X)\)，并给定失效区域 \(\Omega\)。
+### ❌ 禁止写法
 
-我们关心的核心概率为失效概率  
-\(\,P_{\mathrm{fail}} = P(Y \in \Omega)\)。
+```markdown
+\( a + b \)
+```
 
----
+**原因说明：**
 
-## Indicator Function Definition
+-  `$...$` 在 Markdown / Pandoc / LaTeX 全链路兼容
+-  `\(...\)` 在多数 Markdown 渲染器中无法识别
+-  使用 `\(...\)` 极易导致 Pandoc 或编辑器渲染异常
+    
+## 2. 行间公式（Display Math）
 
-为便于后续推导，引入指标函数（indicator function）定义如下：
+### ✅ 推荐写法
 
+```markdown
 $$
-I(X) =
-\begin{cases}
-1, & Y(X) \in \Omega \\
-0, & Y(X) \notin \Omega
-\end{cases}
+E = mc^2
 $$
+```
 
-> ⚠️ 注意  
-> - 草稿阶段 **不写公式编号**
-> - 不使用 `$$ ... $$ {#eq:...}`  
-> - 编号留到 LaTeX 阶段统一处理  
+- Pandoc 可稳定转换为 LaTeX display math
+- 主流 Markdown 编辑器可正常预览
 
----
+## 3. 多行公式与对齐（高风险区域）
 
-## Failure Probability Expression
+### ❌ 错误写法（一定会导致 LaTeX 报错）
 
-基于上述定义，失效概率可写为：
+```markdown
+$$
+P_{fail} & = \int f(x)\,dx
+$$
+```
 
+**问题原因：**
+
+- `&` 只能出现在 `aligned / align` 等环境中  
+- 单独使用 `$$ ... $$` 时不能直接对齐
+
+### ✅ 正确写法（唯一安全方式）
+
+```markdown
 $$
 \begin{aligned}
 P_{\mathrm{fail}}
 &= P(Y \in \Omega) \\
-&= \int_{\Omega} f(X)\,dX \\
-&= \int_{-\infty}^{+\infty} I(X)\,f(X)\,dX
+&= \int_{\Omega} f(X)\, dX \\
+&= \int_{-\infty}^{+\infty} I(X) f(X)\, dX
 \end{aligned}
 $$
+```
 
-> ⚠️ 注意  
-> - `&` 只能出现在 `aligned` 中  
-> - 不在 `$$` 内直接写 `&`  
+## 4. 公式编号（非常重要）
 
----
+### ❌ Markdown 阶段禁止的写法
 
-# Ranking-Based High-Sigma Monte Carlo
+```markdown
+$$
+E = mc^2
+$$ {#eq:energy}
+```
 
-在有限仿真预算条件下，传统 Monte Carlo 方法难以直接观测  
-\(\,6\sigma\) 甚至更高 sigma 区域的极端样本。
+**原因：**
 
-为此，引入基于排序的 High-Sigma Monte Carlo（HSMC）方法，
-其核心思想是优先仿真 **预测最差的样本子集**。
+*   Pandoc 对数学块 ID 的支持不稳定    
+*   极易触发 `\mathcal allowed only in math mode` 等错误
 
----
+### ✅ 正确策略（推荐流程）
 
-## Key Sets and Notation
+*   Markdown 阶段：**不编号**
+*   LaTeX 阶段统一编号：
 
-- \(\mathcal{E}^*\)：真实的极端样本集合（失效样本集合）
-- \(\hat{r}(x)\)：代理模型预测的样本排序名次
-- \(K\)：每轮仿真预算规模
+```latex
+\begin{equation}
+E = mc^2
+\label{eq:energy}
+\end{equation}
+```
 
-> ⚠️ 注意  
-> - 列表中使用数学符号时，仍使用 `$begin:math:text$\.\.\.$end:math:text$`  
-> - 不要写 `$ \mathcal{E}^* $`  
+## 5. 公式引用
 
----
+### ✅ Markdown 中允许的写法（LaTeX 兼容）
 
-## Practical Pitfall
+```markdown
+As shown in Eq.~\eqref{eq:energy}, the failure probability decreases.
+```
 
-一种常见但隐蔽的做法是：  
-仅在代理模型预测排名前 \(\,K\) 的样本上估计排序误差，
-即将误差估计限制在集合  
-\(\,\{x : \hat{r}(x) \le K\}\)。
+*   Markdown 预览阶段仅作为普通文本
+*   Pandoc 会原样保留
+*   LaTeX 编译阶段生效
 
-然而，该做法存在根本缺陷：  
-**若真实极端样本被错排至 \(\hat{r}(x) > K\)，
-则其排序误差无法被观测。**
+## 6. 中文与数学混排（XeLaTeX 场景）
 
----
+### ❌ 错误写法
 
-# Figures
+```markdown
+$ 当 n > 0 时 $
+```
 
-下图示意了 SRAM Read Current 在低电压条件下的统计分布形态。
+### ✅ 正确写法
 
-![Read current distribution under low VDD](figs/read_current.png)
+```markdown
+当 $n > 0$ 时
+```
 
-> ⚠️ 注意  
-> - 草稿阶段不强制引用图编号  
-> - 正文中写“如图所示”即可  
+**原则：**
 
----
+*   数学环境中只出现数学符号    
+*   中文始终放在数学环境外
+    
+## 7. 图片（Figures）
 
-# Tables
+### ✅ 推荐写法
 
-下表给出了不同 sigma 等级下的理论失效概率。
+```markdown
+![Yield vs sigma](figures/yield_sigma.png)
+```
 
-| Sigma level | Failure probability |
-|------------:|--------------------:|
-| 3σ          | \(2.7\times10^{-3}\) |
-| 6σ          | \(1.0\times10^{-9}\) |
+*   不在 Markdown 中强制编号    
+*   不使用 `\label` / `\ref`
+*   LaTeX 阶段统一使用 `figure` 环境处理
+    
 
-: Failure probability at different sigma levels
+## 8. 表格（Tables）
 
----
+### ✅ 简单表格（Markdown）
 
-# Related Work
+```markdown
+| Sigma | Failure Probability |
+|------:|--------------------:|
+| 3σ    | 1.35e-3             |
+| 6σ    | 9.9e-10             |
+```
 
-SRAM 读电流的统计变异性已在多项工作中被系统研究
-[@fischer2008; @wang2011; @venugopalan2013]。
-这些研究揭示了在近阈值区域，
-读路径的等效堆叠结构会引入显著的负反馈效应。
+### ⚠️ 复杂表格（建议 LaTeX 阶段处理）
 
----
+*   合并单元格
+*   跨页表格
+*   精细列对齐
+*   注释与脚注
+    
+## 9. 参考文献（BibTeX / BibLaTeX）
 
-# Conclusion
+### ✅ Pandoc 推荐引用方式
 
-本文从统计建模与算法设计角度，
-系统分析了排序误差对 High-Sigma Monte Carlo 方法可靠性的影响，
-并指出在尾部区域必须显式控制漏检风险。
+```markdown
+This method follows @wang2011nongaussian.
+```
 
----
+### 多篇引用
 
-# References
+```markdown
+Several approaches have been proposed [@wang2011nongaussian; @venugopalan2013sram].
+```
+
+*   只关心 citation key 是否正确
+*   引用样式由 LaTeX 决定
+    
+## 10. 代码块
+
+```python
+def estimate_failure():
+    pass
+```
+
+- Pandoc 转换稳定
+- LaTeX 阶段可选择 `listings` 或 `minted`
+
+## 11. 明确禁止清单（高危写法）
+
+❌ 行内公式使用 `\(...\)`  
+❌ 在 `$$ ... $$` 中直接使用 `&`  
+❌ Markdown 阶段给公式编号  
+❌ 数学环境中混入中文  
+❌ Markdown 中嵌套 `equation` / `align` 等 LaTeX 环境  
+
+
+## 12. 推荐写作工作流（总结）
+
+1. **Markdown 阶段**：专注内容与逻辑
+2. **Pandoc 阶段**：仅做结构转换
+3. **LaTeX 阶段**：统一编号、引用、排版、投稿格式
+
+> **Markdown 负责「写清楚」  
+> LaTeX 负责「排好看」**
+
+

@@ -7,7 +7,7 @@ bibliography: references.bib
 
 # Introduction
 
-> 这是一个示例，展示了如何变现兼容pandox可转化为正确latex的markdown文件
+> 这是一个示例，展示了如何编写兼容pandox可转化为正确latex的markdown文件
 
 本文研究高维随机电路性能在 **high-sigma** 条件下的统计建模与分析问题。  
 在先进 SRAM 设计中，性能指标往往可表示为高维随机变量的非线性映射  
@@ -17,7 +17,7 @@ bibliography: references.bib
 [@wang2011; @venugopalan2013]。
 
 > ⚠️ 注意  
-> - 行内公式统一使用 `$begin:math:text$\.\.\.$end:math:text$`  
+> - 行内公式统一使用 `\(...\)`  
 > - 不使用 `$...$`  
 
 ---

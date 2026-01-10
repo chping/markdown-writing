@@ -184,10 +184,12 @@ Several approaches have been proposed [@wang2011nongaussian; @venugopalan2013sra
     
 ## 10. 代码块
 
+````markdown
 ```python
 def estimate_failure():
     pass
 ```
+````
 
 - Pandoc 转换稳定
 - LaTeX 阶段可选择 `listings` 或 `minted`

@@ -179,7 +179,6 @@ main_file="$OUTPUT_DIR/main.tex"
 $PANDOC  --defaults="$CONFIG_YAML" \
      --from=markdown --to=latex --standalone \
     --template="$TEMPLATE_MAIN" \
-    -M "inputs=$(cat "$TMP_LIST")" \
     --metadata-file=<(printf "inputs: |\n"; sed 's/^/  /' "$TMP_LIST") \
     -o "$main_file" /dev/null
 rm -f "$TMP_LIST"

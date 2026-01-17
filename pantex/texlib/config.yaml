@@ -1,6 +1,10 @@
 metadata:
-  reference-section-title: "参考文献"
+  title: "Title"
+  author: "Author Name"
+  date: "2026-01-17"
+  lang: zh-CN
   link-citations: true
-  lang: "en"
+  reference-section-title: "参考文献"
 
 number-sections: true
+

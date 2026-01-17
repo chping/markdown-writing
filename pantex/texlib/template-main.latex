@@ -17,7 +17,6 @@
 \usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 
 % Useful packages
-\usepackage{amsmath}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
@@ -45,12 +44,60 @@
 % 紧凑列表宏；避免 \tightlist 未定义
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
-\title{_Title_}
-\author{_AuthorName_}
+
+% =========================
+% Safe title text for titlepage (robust)
+% =========================
+\makeatletter
+\newcommand{\SafeTitleText}[1]{\detokenize{#1}}
+\makeatother
+
+% =========================
+% Pandoc metadata -> LaTeX title/author/date
+% =========================
+\title{$if(title)$$title$$else$Untitled$endif$}
+\author{$if(author)$$author$$else$Anonymous$endif$}
+\date{$if(date)$$date$$else$\today$endif$}
 
 \begin{document}
 
-%%INPUTS%%
+% =========================
+% Title Page
+% =========================
+\begin{titlepage}
+  \centering
+  \null
+  \vspace*{2.5cm}
 
+  {\zihao{2}\bfseries \SafeTitleText{$title$}\par}
+  \vspace{2.5cm}
+
+  {\zihao{4}
+    \begin{tabular}{rl}
+      Author： & \SafeTitleText{$author$} \\
+      Date： & $date$ \\
+    \end{tabular}
+  }
+
+  \vfill
+\end{titlepage}
+\clearpage
+
+% =========================
+% Table of Contents
+% =========================
+\pdfbookmark[0]{目录}{toc}
+\tableofcontents
+\clearpage
+
+% =========================
+% Main Content
+% =========================
+$inputs$
+
+% =========================
+% Bibliography
+% =========================
+\clearpage
 \printbibliography
 \end{document}
